@@ -13,7 +13,7 @@ import (
 	pb "GrpcLargeFileTransfer/api/v1"
 )
 
-func uploadFile(client pb.FileServiceClient, filename string) {
+func uploadFile(client pb.FileServiceClient, filename string, chunkSize int) {
 	stream, err := client.Upload(context.Background())
 	if err != nil {
 		log.Fatalf("Failed to create stream: %v", err)
@@ -25,7 +25,7 @@ func uploadFile(client pb.FileServiceClient, filename string) {
 	}
 	defer file.Close()
 
-	buf := make([]byte, 64*1024) // 64KB chunks
+	buf := make([]byte, chunkSize) // 64KB chunks
 	for {
 		n, err := file.Read(buf)
 		if err == io.EOF {
@@ -66,7 +66,8 @@ func main() {
 	}
 	defer conn.Close()
 	fileName := flag.String("fileName", "", "Filename to upload")
+	chunkSize := flag.Int("chunkSize", 1*1024*1024, "Chunk size in bytes, default: 1MB")
 	flag.Parse()
 	client := pb.NewFileServiceClient(conn)
-	uploadFile(client, *fileName)
+	uploadFile(client, *fileName, *chunkSize)
 }

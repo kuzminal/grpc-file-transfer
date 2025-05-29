@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package file.v1;
+
+option go_package = "github.com/yourname/my-grpc-project/api/v1";
+
+service FileService {
+  rpc Upload(stream UploadRequest) returns (UploadResponse);
+  rpc Download(DownloadRequest) returns (stream DownloadResponse);
+}
+
+message UploadRequest {
+  bytes chunk = 1;
+  string filename = 2;
+}
+
+message UploadResponse {
+  string id = 1;
+  uint32 size = 2;
+}
+
+message DownloadRequest {
+  string id = 1;
+}
+
+message DownloadResponse {
+  bytes chunk = 1;
+}
